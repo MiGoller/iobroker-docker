@@ -1,0 +1,61 @@
+#!/usr/bin/with-contenv bash
+set -e
+
+# Restore default configuration to mounted volume?
+if [ `find /opt/iobroker -type f | wc -l` -lt 1 ]; then
+    # Restore new ioBroker instance from initial backup
+    echo "--------------------------------------------------------------------------------"
+    echo "Configuration-directory /opt/iobroker/ is empty!"
+    echo "Creating new ioBroker instance ..."
+    tar -xf /opt/initial_iobroker.tar -C /
+    echo "--------------------------------------------------------------------------------"
+elif [ -f /opt/iobroker/iobroker ]; then
+    # ioBroker found
+    echo "Found existing ioBroker instance."
+elif [ $(ls /opt/iobroker/20*_backupiobroker.tar.gz 2> /dev/null | wc -l) != "0" ]; then
+    # Check for valid ioBroker backup file.
+    if [ $(tar -ztvf /opt/iobroker/20*_backupiobroker.tar.gz "backup/backup.json" 2> /dev/null | wc -l) != "0" ]; then
+        # Found ioBroker backup
+        mv /opt/iobroker/20*_backupiobroker.tar.gz /opt/
+
+        echo "Creating new ioBroker instance ..."
+        tar -xf /opt/initial_iobroker.tar -C /
+        rm -f /opt/iobroker/.install_host
+        
+        mkdir /opt/iobroker/backups
+        
+        mv /opt/20*_backupiobroker.tar.gz /opt/iobroker/backups/
+        
+        echo "Fixing permissions ..."
+        chown -R iobroker /opt/iobroker
+
+        echo "Restoring backup ..."
+        iobroker restore 0 > /opt/iobroker/log/restore.log 2>&1
+
+        echo "Restore completed. Check /opt/iobroker/log/restore.log for any errors."
+        echo "If the data has been restored successfully, ioBroker will start to install the required adapters. This will take some time. Be patient, please."
+    fi
+else
+    # Mounted volume /opt/iobroker is corrupted.
+    echo "Mounted volume /opt/iobroker is corrupted. Please verify your setup!"
+    exit 1
+fi
+
+# Checking for first run and renaming ioBroker
+if [ -f /opt/iobroker/.install_host ]; then
+    echo "--------------------------------------------------------------------------------"
+    echo "First run preparation ..."
+    echo " - Set first-run flag /opt/.firstrun ..."
+    touch /opt/.firstrun
+
+    echo " - Set ioBroker hostname to $(hostname) ..."
+    # /opt/iobroker/iobroker host <oldHostname>
+    /opt/iobroker/iobroker host $(cat /opt/iobroker/.install_host)
+    rm -f /opt/iobroker/.install_host
+
+    echo " - Fixing permissions ..."
+    chown -R iobroker /opt/iobroker
+
+    echo "First run preparation done..."
+    echo "--------------------------------------------------------------------------------"
+fi

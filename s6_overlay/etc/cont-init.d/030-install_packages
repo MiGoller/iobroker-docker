@@ -1,0 +1,12 @@
+#!/usr/bin/with-contenv bash
+set -e
+
+# Install additional packages?
+if [ "$PACKAGES" != "" ]; then
+    echo "--------------------------------------------------------------------------------"
+    echo "The following packages will be installed: $PACKAGES"
+    apt-get update
+    apt-get install -y $PACKAGES
+    rm -rf /var/lib/apt/lists/*
+    echo "--------------------------------------------------------------------------------"
+fi

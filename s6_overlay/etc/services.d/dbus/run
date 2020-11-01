@@ -1,0 +1,8 @@
+#!/usr/bin/with-contenv bash
+set -e
+
+#
+#   Start dbus daemon as S6 service
+#
+
+exec dbus-daemon --system --nofork

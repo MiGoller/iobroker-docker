@@ -1,0 +1,86 @@
+#!/usr/bin/with-contenv bash
+
+#
+#   Runs and controls the ioBroker daemon as a S6 service.
+#
+
+set -e
+
+# Graceful shutdown the service by SIGTERM signal
+iob_shut_down() {
+
+    pid=$(ps -ef | awk '/[j]s.controller/{print $2}')
+
+    if [ "$pid" != "" ]; then
+        echo "Shutting down ioBroker service (PID $pid) ... "
+        kill -SIGTERM "$pid"
+
+        echo "Waiting for ioBroker controller to shut down ... "
+        until [ "$(ps -ef | awk '/[j]s.controller/{print $2}')" == "" ]
+        do
+            sleep 1
+        done
+    fi
+
+    if [ ! -f /opt/iobroker/.maintenance ]; then
+        echo "Waiting for ioBroker shutting down gracefully ... "
+        while [ -f /opt/iobroker/node_modules/iobroker.js-controller/iobroker.pid ]
+        do
+            sleep 1
+        done
+    fi
+
+    echo "ioBroker service has terminated."
+
+    exit
+}
+
+# Function to wait for a file to appear
+wait_file() {
+    local file="$1"; shift
+    local wait_seconds="${1:-10}"; shift # default timeout 10 sec.
+
+    until test $((wait_seconds--)) -eq 0 -o -e "$file" ; do sleep 1; done
+
+    ((++wait_seconds))
+}
+
+# Trap to get signal for graceful shutdown
+trap 'iob_shut_down' SIGTERM
+
+if [ -f /opt/iobroker/.maintenance ]; then
+    # Maintenance mode!
+    cat << EOF
+ #     #                                                                                                
+ ##   ##   ##   # #    # ##### ###### #    #   ##   #    #  ####  ######    #    #  ####  #####  ###### 
+ # # # #  #  #  # ##   #   #   #      ##   #  #  #  ##   # #    # #         ##  ## #    # #    # #      
+ #  #  # #    # # # #  #   #   #####  # #  # #    # # #  # #      #####     # ## # #    # #    # #####  
+ #     # ###### # #  # #   #   #      #  # # ###### #  # # #      #         #    # #    # #    # #      
+ #     # #    # # #   ##   #   #      #   ## #    # #   ## #    # #         #    # #    # #    # #      
+ #     # #    # # #    #   #   ###### #    # #    # #    #  ####  ######    #    #  ####  #####  ###### 
+EOF
+
+    # Wait for end of maintenance mode.
+    while [ -f /opt/iobroker/.maintenance ]
+    do
+        sleep 1 # or less like 0.2
+    done
+else
+    # Start ioBroker
+    echo "Starting ioBroker service ..."
+    /opt/iobroker/iobroker start
+
+
+    # Wait for ioBroker to start and to create it's pid-file
+    wait_file "/opt/iobroker/node_modules/iobroker.js-controller/iobroker.pid" && {
+        echo "ioBroker service has started."
+        # Keep S6 service up and running while pid-file exists.
+        while [ -f /opt/iobroker/node_modules/iobroker.js-controller/iobroker.pid ] || [ -f /opt/iobroker/.maintenance ]
+        do
+            sleep 1 # or less like 0.2
+        done
+
+        # pid-file has gone.
+        echo "ioBroker service terminating ..."
+    }
+fi

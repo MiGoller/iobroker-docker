@@ -1,0 +1,38 @@
+#!/usr/bin/with-contenv bash
+set -e
+
+# Set iobroker's uid and gid
+if [ -n "${GID}" ]; then
+    if [ "${GID}" != "0" ]; then
+        echo "Setting iobroker's group id (gid) to ${GID} ..."
+        groupmod -g ${GID} iobroker
+        usermod -g ${GID} iobroker
+    fi
+fi
+
+if [ -n "${UID}" ]; then
+    if [ "${UID}" != "0" ]; then
+        echo "Setting iobroker's user id (uid) to ${UID} ..."
+        usermod -u ${UID} iobroker
+    fi
+fi
+
+# # Fix permissions to /opt/iobroker
+# echo "Fix permissions to /opt/iobroker ... Be patient, please."
+# chown -R iobroker /opt/iobroker
+
+# Set permissions for USB-devices
+if [ "$USBDEVICES" != "" ]; then
+    IFS=';' read -ra devicearray <<< "$USBDEVICES"
+        for i in "${devicearray[@]}"
+        do
+            echo "Setting permissions for device $i ..."
+            chown root:dialout $i
+            chmod g+rw $i
+        done
+fi
+
+# Create symbolic links for scripts
+if [ ! -f /opt/iobroker/iobmaintenance ]; then
+    ln -s /opt/scripts/iobmaintenance.sh /opt/iobroker/iobmaintenance
+fi

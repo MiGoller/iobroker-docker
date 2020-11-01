@@ -1,0 +1,6 @@
+.vscode
+.git
+.gitignore
+.github
+datadir
+20*_backupiobroker.tar.gz

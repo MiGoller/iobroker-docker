@@ -1,0 +1,28 @@
+version: '2'
+services:
+  master:
+    image: iobrokertest
+    build:
+      context: .
+      args:
+        - ARG_NODE_VERSION=12
+        - ARG_S6_OVERLAY_VERSION=2.1.0.2
+        - ARG_APP_COMMIT=local
+    container_name: iobroker_test
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+      - ./datadir:/opt/iobroker
+    environment:
+      - LANG=de_DE.UTF-8
+      - LANGUAGE=de_DE:de
+      - LC_ALL=de_DE.UTF-8
+      - TZ=Europe/Berlin
+      - IOB_ADMINPORT=8081
+    # ports:
+    #   - "8081:8081"
+    #   - "8082:8082"
+    #   - "8083:8083"
+    #   - "8084:8084"
+    #   - "9001:9001"
+    network_mode: host
