@@ -1,0 +1,20 @@
+#!/usr/bin/with-contenv bash
+set -e
+
+# S6-Overlay related stuff
+
+# Check for stale ioBroker PID-files
+if [ -f /opt/iobroker/node_modules/iobroker.js-controller/iobroker.pid ]; then
+    echo "Removing previous stale PID-file iobroker.pid ..."
+    rm -f /opt/iobroker/node_modules/iobroker.js-controller/iobroker.pid
+fi
+
+if [ -f /opt/iobroker/node_modules/iobroker.js-controller/pids.txt ]; then
+    echo "Removing previous stale PID-file pids.txt ..."
+    rm -f /opt/iobroker/node_modules/iobroker.js-controller/pids.txt
+fi
+
+# Create additional logging directories
+mkdir -p /opt/iobroker/log/s6-overlay
+touch /opt/iobroker/log/s6-overlay/current
+chown -R nobody:nogroup /opt/iobroker/log/s6-overlay

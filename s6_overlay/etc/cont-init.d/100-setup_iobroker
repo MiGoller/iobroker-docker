@@ -1,0 +1,35 @@
+#!/usr/bin/with-contenv bash
+set -e
+
+# Ensure ioBroker node hostname matches the hostname of this container.
+if [ $(/opt/iobroker/iobroker object get system.adapter.admin.0 --pretty | grep -oP '(?<="host": ")[^"]*') != $(hostname) ]; then
+    echo "Setting ioBroker node's name to the container's hostname: $(hostname) ..."
+    # /opt/iobroker/iobroker host <oldHostname>
+    /opt/iobroker/iobroker host $(iobroker object get system.adapter.admin.0 --pretty | grep -oP '(?<="host": ")[^"]*')
+fi
+
+# Set ioBroker admin adapter to a different port?
+if [ "$IOB_ADMINPORT" != "" ]; then
+    echo "Set ioBroker's admin adapter port to $IOB_ADMINPORT ..."
+    /opt/iobroker/iobroker set admin.0 --port $IOB_ADMINPORT
+fi
+
+# Disable Sentry.io plugin at all?
+if [ ! -f /opt/.firstrun ]; then
+    # Enabling / disableling Sentry.io plugin would fail on first run, because the EULA would not be accepted right now.
+    case "$IOB_DISABLE_SENTRY" in
+        # true or 1
+        [tT][rR][uU][eE]|1)
+            echo "DISABLE Sentry.io plugin ... "
+            /opt/iobroker/iobroker plugin disable sentry
+            ;;
+
+        # false or 0
+        [fF][aA][lL][sS][eE]|0)
+            echo "ENABLE Sentry.io plugin ... "
+            /opt/iobroker/iobroker plugin enable sentry
+            ;;
+    esac
+else
+    echo "Skipping configuration for Sentry.io plugin on first run!"
+fi

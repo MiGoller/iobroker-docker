@@ -1,0 +1,12 @@
+#!/usr/bin/with-contenv bash
+set -e
+
+#
+#   Start AVAHI daemon as S6 service
+#
+
+# Wait for dbus-daemon to start
+sleep 2
+
+# Start AVAHI daemon
+exec avahi-daemon

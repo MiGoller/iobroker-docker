@@ -1,0 +1,2 @@
+#!/bin/bash
+exec logutil-service /opt/iobroker/log/s6-overlay

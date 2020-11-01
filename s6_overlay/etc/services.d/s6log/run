@@ -1,0 +1,8 @@
+#!/usr/bin/with-contenv bash
+set -e
+
+#
+#   This service passes the S6-overlay services' logfile to stdout
+#
+
+exec tail -f -n 0 /opt/iobroker/log/s6-overlay/current

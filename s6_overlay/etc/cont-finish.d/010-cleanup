@@ -1,0 +1,19 @@
+#!/usr/bin/with-contenv bash
+set -e
+
+# Check for stale ioBroker PID-files
+if [ -f /opt/iobroker/node_modules/iobroker.js-controller/iobroker.pid ]; then
+    echo "Removing stale PID-file iobroker.pid ..."
+    rm -f /opt/iobroker/node_modules/iobroker.js-controller/iobroker.pid
+fi
+
+if [ -f /opt/iobroker/node_modules/iobroker.js-controller/pids.txt ]; then
+    echo "Removing stale PID-file pids.txt ..."
+    rm -f /opt/iobroker/node_modules/iobroker.js-controller/pids.txt
+fi
+
+# Remove first-run flag if existing
+if [ -f /opt/.firstrun ]; then
+    echo "Removing first-run flag ..."
+    rm -f /opt/.firstrun
+fi
