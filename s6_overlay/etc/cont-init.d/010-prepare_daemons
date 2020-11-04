@@ -20,6 +20,5 @@ mkdir -p /var/run/dbus/
 
 # Setup logging
 if [ -d /opt/iobroker/log ]; then
-    touch /opt/iobroker/log/iobroker.current.log
     chown -R iobroker /opt/iobroker/log
 fi

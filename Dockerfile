@@ -1,6 +1,5 @@
 ARG ARG_NODE_VERSION="12"
-ARG ARCH
-FROM ${ARCH:-library}/node:${ARG_NODE_VERSION}
+FROM node:${ARG_NODE_VERSION}
 
 # Build arguments ...
 
@@ -16,9 +15,6 @@ ARG ARG_S6_OVERLAY_VERSION="2.1.0.2"
 
 # The commit sha triggering the build.
 ARG ARG_APP_COMMIT
-
-# The base image arch
-ARG ARCH
 
 # Basic build-time metadata as defined at http://label-schema.org
 LABEL \
@@ -40,9 +36,7 @@ LABEL \
 ENV \
     DEBIAN_FRONTEND="noninteractive" \
     IMAGE_VERSION="${ARG_NODE_VERSION}.${ARG_IMAGE_VERSION}" \
-    S6_OVERLAY_VERSION=${ARG_S6_OVERLAY_VERSION} \
-    OPENZWAVE_VERSION=${ARG_OPENZWAVE_VERSION} \
-    IMAGE_ARCH=${ARCH:-x86_64}
+    S6_OVERLAY_VERSION=${ARG_S6_OVERLAY_VERSION}
 
 # Install prerequisites
 RUN \
@@ -85,16 +79,23 @@ RUN \
 # Install S6-Overlay
 RUN \
     # Determine S6 arch to download and to install
-    case "${IMAGE_ARCH}" in \
-        x86_64) S6_ARCH='amd64';; \
-        arm) S6_ARCH='armhf';; \
-        aarch64) S6_ARCH='aarch64';; \
-        *) echo "Unsupported architecture for S6: ${IMAGE_ARCH}"; exit 1 ;; \ 
+    S6_ARCH="" \
+    && dpkgArch="$(dpkg --print-architecture)" \
+    && case "${dpkgArch##*-}" in \
+        amd64) S6_ARCH='amd64';; \
+        ppc64el) S6_ARCH='ppc64le';; \
+        arm64) S6_ARCH='armhf';; \
+        arm) S6_ARCH='arm';; \
+        armel) S6_ARCH='arm';; \
+        armhf) S6_ARCH='armhf';; \
+        i386) S6_ARCH='x86';; \
+        *) echo "Unsupported architecture for S6: ${dpkgArch}"; exit 1 ;; \ 
     esac \
     && curl -L -s "https://github.com/just-containers/s6-overlay/releases/download/v${ARG_S6_OVERLAY_VERSION}/s6-overlay-${S6_ARCH}.tar.gz" \
         | tar zxvf - -C / \
     && mkdir -p /etc/fix-attrs.d \
-    && mkdir -p /etc/services.d 
+    && mkdir -p /etc/services.d \
+    && echo "S6 Overlay v${ARG_S6_OVERLAY_VERSION} (${S6_ARCH} for dpkArch ${dpkgArch}) installed on ${BUILDPLATFORM} for ${TARGETPLATFORM}."
 
 # Install ioBroker
 # Building on GitHub CI will fail with CAP_NET_ADMIN set !
