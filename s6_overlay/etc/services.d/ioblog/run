@@ -16,7 +16,7 @@ wait_file() {
     ((++wait_seconds))
 }
 
-wait_file "/opt/iobroker/log/iobroker.current.log" 10 && {
+wait_file "/opt/iobroker/log/iobroker.current.log" 600 && {
     # ioBroker logfile exists.
     exec tail -f -n 0 /opt/iobroker/log/iobroker.current.log
 }

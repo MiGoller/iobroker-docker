@@ -4,3 +4,4 @@
 .github
 datadir
 20*_backupiobroker.tar.gz
+runImage.sh

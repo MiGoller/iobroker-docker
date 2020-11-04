@@ -25,7 +25,7 @@ cat << EOF
                              
 EOF
 
-echo "Image:            v$IMAGE_VERSION ($(uname -m))"
+echo "Image:            v$IMAGE_VERSION ($(dpkg --print-architecture))"
 echo "Node.js version:  $(node -v)"
 echo "NPM version:      v$(npm -v)"
 echo ""
