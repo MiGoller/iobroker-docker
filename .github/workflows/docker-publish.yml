@@ -88,27 +88,13 @@ jobs:
           echo ::set-output name=IMAGE_ID::${IMAGE_ID}
           echo ::set-output name=IMAGE_REF::${VERSION}
 
-      - name: Build and push linux/amd64
-        id: docker_build_amd64
+      - name: Build and push
+        id: docker_build
         uses: docker/build-push-action@v2
         with:
           context: .
           file: ./Dockerfile
-          platforms: linux/amd64
-          push: true
-          tags: |
-            ${{ steps.image_information.outputs.IMAGE_ID }}:latest
-            ${{ steps.image_information.outputs.IMAGE_ID }}:${{ env.NODE_VERSION }}
-            ghcr.io/${{ steps.image_information.outputs.IMAGE_ID }}:latest
-            ghcr.io/${{ steps.image_information.outputs.IMAGE_ID }}:${{ env.NODE_VERSION }}
-      
-      - name: Build and push linux/arm/v7
-        id: docker_build_armv7
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          file: ./Dockerfile
-          platforms: linux/arm/v7
+          platforms: linux/amd64,linux/arm/v7
           push: true
           tags: |
             ${{ steps.image_information.outputs.IMAGE_ID }}:latest
