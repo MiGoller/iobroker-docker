@@ -105,10 +105,7 @@ RUN curl -sL https://iobroker.net/install.sh | sed -e 's/cap_net_admin,//' | bas
     && rm -rf /var/lib/apt/lists/* \
     # Setup iobroker user \
     && chsh -s /bin/bash iobroker \
-    # Update ioBroker
-    && /opt/iobroker/iobroker update \
-    && /opt/iobroker/iobroker upgrade self \
-    && /opt/iobroker/iobroker upgrade all
+    && echo "ioBroker installed."
 
 WORKDIR /opt/iobroker
 
