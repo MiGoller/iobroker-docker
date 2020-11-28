@@ -73,7 +73,9 @@ else
 
     # Wait for ioBroker to start and to create it's pid-file
     wait_file "/opt/iobroker/node_modules/iobroker.js-controller/iobroker.pid" && {
-        echo "ioBroker service has started."
+        echo "================================================="
+        echo "####      ioBroker service has started.      ####"
+        echo "================================================="
         # Keep S6 service up and running while pid-file exists.
         while [ -f /opt/iobroker/node_modules/iobroker.js-controller/iobroker.pid ] || [ -f /opt/iobroker/.maintenance ]
         do
