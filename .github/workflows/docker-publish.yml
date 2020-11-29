@@ -31,7 +31,7 @@ jobs:
   # See also https://docs.docker.com/docker-hub/builds/automated-testing/
   test:
     runs-on: ubuntu-latest
-    if: contains('pull-request', github.event_name)
+    if: contains('pull_request', github.event_name)
     steps:
       - uses: actions/checkout@v2
 
@@ -49,7 +49,7 @@ jobs:
     needs: test
 
     runs-on: ubuntu-latest
-    if: (contains('push pull-request', github.event_name) && github.ref == 'refs/heads/main') || github.event_name == 'schedule'
+    if: (contains('push pull_request', github.event_name) && github.ref == 'refs/heads/main') || github.event_name == 'schedule'
 
     steps:
       - name: Checkout
