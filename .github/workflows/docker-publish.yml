@@ -15,10 +15,7 @@ on:
   pull_request:
 
   schedule:
-    # Rebuild Docker image for master branch only
-    - cron: '15 0 * * 1'
-    branches:
-      - main
+    - cron: '15 0 * * 1' # Weekly on Monday at 00:15
 
 env:
   # TODO: Change variable to your image's name.
@@ -49,7 +46,7 @@ jobs:
     needs: test
 
     runs-on: ubuntu-latest
-    if: {{ contains('push schedule', github.event_name) && github.ref == 'refs/heads/main' }}
+      if: {{ (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'schedule' }}
 
     steps:
       - name: Checkout
