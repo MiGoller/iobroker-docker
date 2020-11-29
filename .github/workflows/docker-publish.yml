@@ -16,7 +16,7 @@ on:
 
   schedule:
     # Rebuild Docker image for master branch only
-    - cron:  '15 0 * * 1'
+    - cron: '15 0 * * 1'
     branches:
       - main
 
