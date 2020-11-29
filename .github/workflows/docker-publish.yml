@@ -28,7 +28,7 @@ jobs:
   # See also https://docs.docker.com/docker-hub/builds/automated-testing/
   test:
     runs-on: ubuntu-latest
-    if: {{ github.event_name == 'push' && github.ref == 'refs/heads/develop' }}
+    if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
     steps:
       - uses: actions/checkout@v2
 
@@ -46,7 +46,7 @@ jobs:
     needs: test
 
     runs-on: ubuntu-latest
-    if: {{ (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'schedule' }}
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'schedule'
 
     steps:
       - name: Checkout
