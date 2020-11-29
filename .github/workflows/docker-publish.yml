@@ -19,7 +19,9 @@ on:
 
   schedule:
     - cron: '15 0 * * 1' # Weekly on Monday at 00:15
-
+  
+  workflow_dispatch:
+  
 env:
   # TODO: Change variable to your image's name.
   IMAGE_NAME: "iobroker"
@@ -46,7 +48,7 @@ jobs:
 
   multi:
     # Ensure test job passes before pushing image.
-    needs: test
+    # needs: test
 
     runs-on: ubuntu-latest
     if: (github.event_name == 'push' && github.ref == 'refs/heads/main')
