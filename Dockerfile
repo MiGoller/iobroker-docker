@@ -67,6 +67,8 @@ RUN \
         avahi-daemon \
         avahi-utils \
         libnss-mdns \
+        # CIFS and NFS support for Backitup
+        cifs-utils nfs-common \
     # Install node-gyp - Node.js native addon build tool
     && npm install -g node-gyp \
     # Generate locales en_US.UTF-8 and de_DE.UTF-8

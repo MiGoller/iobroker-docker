@@ -12,10 +12,4 @@ cleanup()
 
 set -e
 
-if [ ! -d ./datadir ]
-then
-    mkdir -p datadir
-    chmod -R 777 datadir
-fi
-
 docker-compose up --build
