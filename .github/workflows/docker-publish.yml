@@ -35,7 +35,7 @@ jobs:
     runs-on: ubuntu-latest
     if: contains('pull_request', github.event_name)
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3.0.2
 
       - name: Run tests
         run: |
@@ -57,7 +57,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3.0.2
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
